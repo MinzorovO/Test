@@ -4,7 +4,7 @@
 ; Calculation of the ball radius from its mass and density
 ; m_ball - mass 
 ; p_ball - density
-(defn RadiusCalculation [m_ball p_ball]
+(defn BallRadiusCalculation [m_ball p_ball]
   (Math/pow
     (/
       (/ m_ball p_ball)
@@ -15,6 +15,27 @@
   )
 
 
+
+;Расчет расстояния между двумя шариками.
+;Calculation of the distance between the balls
+(defn DistanceBetweenBalls [x_1 y_1 z_1 x_2 y_2 z_2]
+  
+  (Math/pow
+    (+
+      (+
+        (Math/pow (- x_2 x_1) 2)
+        (Math/pow (- y_2 y_1) 2)
+        )
+      
+      (Math/pow (- z_2 z_1) 2)
+      )
+    (/ 1 2)
+    )
+  
+  )
+
+
+
 ; Вычисление силы взаимодействия шариков используя потенциал Ленарда-Джонса
 ; Calculation of the force of interaction of balls using the Lenard-Jones potential
 ; e - the depth of the potential yawner
@@ -22,16 +43,16 @@
 ; q - the distance at which the interaction energy becomes zero
 (defn LennardJonesPower [e r q]
   (cond
-    (<= r (* 2.5 q))
-    (*
-      (/ (* 12 e) q)
-      (-
-        (Math/pow (/ q r) 13)
-        (Math/pow (/ q r) 7)
-        )
-      )
+    (<= r (* 2.5 q)) (*
+                       (/ (* 12 e) q)
+                       (-
+                         (Math/pow (/ q r) 13)
+                         (Math/pow (/ q r) 7)
+                         )
+                       )
     )
   )
+
 
 
 ; Вычисление ускорения учитывая силу взаимодействия и массы шарика
@@ -43,6 +64,7 @@
   )
 
 
+
 ; Вычисление скорости
 (defn Speed [t_step v_current m_ball e r q]
   
@@ -52,6 +74,9 @@
     )
   
   )
+
+
+
 
 ; Вычисление координаты Х 
 (defn X [t_step x_current m_ball e r q]
@@ -71,6 +96,7 @@
   )
 
 
+
 ; Вычисление координаты Y 
 (defn Y [t_step y_current m_ball e r q]
   
@@ -87,13 +113,3 @@
     )
   
   )
-
-
-
-;
-(defn my_main [d_ball h_container w_container k1 k2 k3 temp_max num_of_balls]
-  
-  )
-
-
-
