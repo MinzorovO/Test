@@ -1,95 +1,137 @@
 (ns my-test1)
+(def Xvector [8 2 4 3 6])
+(def Yvector [0 1 1 4 2])
+(def MassVector [1 2 3 4 5])
 
-; Вычисление радиуса шарика из его массы и плотности
-; Calculation of the ball radius from its mass and density
-; m_ball - mass 
-; p_ball - density
-(defn BallRadiusCalculation [m_ball p_ball]
-  (Math/pow
-    (/
-      (/ m_ball p_ball)
-      (/ (* 4 (Math/PI)) 3) 
-      )
-    (/ 1 3)
-    )
+
+
+;Реализация цикла for 
+(defmacro for-loop [[sym init check change :as params] & steps]
+  `(loop [~sym ~init value# nil]
+     (if ~check
+       (let [new-value# (do ~@steps)]
+         (recur ~change new-value#))
+       value#)))
+
+
+
+;вычитание значений в скобках и возведение их в квадрат
+(defn x1-x2Sqr[inpVector]
+  
+  (map
+    (fn [x]
+      (map
+        (fn [y]
+          (Math/pow (- x y) 2)
+          )
+        inpVector))
+    inpVector)
+  
   )
 
 
 
-;Расчет расстояния между двумя шариками.
-;Calculation of the distance between the balls
-(defn DistanceBetweenBalls [x_1 y_1 z_1 x_2 y_2 z_2]
+;Нахождение минимального расстояния между шариками
+(defn DistanceBetweenBalls [inpVectorX inpVectorY i]  
   
-  (Math/pow
-    (+
-      (+
-        (Math/pow (- x_2 x_1) 2)
-        (Math/pow (- y_2 y_1) 2)
+  (Math/sqrt
+    (apply min
+           (findAndDelZero (vec (map + inpVectorX inpVectorY)))           
+           )
+    )
+  
+  )
+;Нахождение и удаление "0"
+(defn findAndDelZero [inpV]
+  (remove-indexed
+    inpV
+    (first (indices zero? inpV))
+    )
+  )
+;Нахождение индекса минимального значения
+(defn findIndxOfMin [inpVec]
+  (.indexOf 
+    inpVec 
+    (apply min 
+           (findAndDelZero inpVec)
+           )
+    )
+  )
+;Нахождение индекса максимального значения
+;(defn findIndxOfMax [inpVec]
+;  (.indexOf 
+;    inpVec 
+;    (apply max 
+;           (findAndDelZero inpVec)
+;           )
+;    )
+;  )
+;Нахождение индекса указанного значения
+(defn indices [pred coll]
+  (keep-indexed #(when (pred %2) %1) coll)
+  )
+;Удаление из массива по индексу
+(defn remove-indexed [v n]
+  (into (subvec v 0 n) (subvec v (inc n)))
+  )
+
+
+
+;временная функция для тестирования и отладки других функций
+(defn test_sm [Xvector Yvector]
+  
+  (def tempVec (into-array (repeat (*(count Xvector)3) 0.)))
+  
+  
+  (for-loop [i 0 (< i (count Xvector)) (inc i)] 
+            
+            (aset tempVec (* i 3) (double i))
+            
+            (aset tempVec (+(* i 3)1)
+                  (double
+                    (findIndxOfMin 
+                      (vec (map + ((vec (x1-x2Sqr Xvector))i) ((vec (x1-x2Sqr Yvector))i)))
+                      )
+                    )
+                  )
+            
+            (aset tempVec (+(* i 3)2)
+                  (DistanceBetweenBalls 
+                    ((vec (x1-x2Sqr Xvector))i) 
+                    ((vec (x1-x2Sqr Yvector))i) 
+                    i 
+                    )
+                  )     
+            
+            )
+  
+  (println
+    (get 
+      tempVec 
+      (+(* (three (vec tempVec))3)2)
+      )
+    )
+  
+  
+  (println
+    (Xvector
+      (int
+        (get 
+          tempVec 
+          (+(* (three (vec tempVec))3)1)
+          )
         )
-      
-      (Math/pow (- z_2 z_1) 2)
       )
-    (/ 1 2)
     )
   
-  )
-
-
-
-; Вычисление силы взаимодействия шариков используя потенциал Ленарда-Джонса
-; Calculation of the force of interaction of balls using the Lenard-Jones potential
-; e - the depth of the potential yawner
-; r - the distance between the centers of the particles
-; q - the distance at which the interaction energy becomes zero
-(defn LennardJonesPower [e r q]
-  (cond
-    (<= r (* 2.5 q)) (*
-                       (/ (* 12 e) q)
-                       (-
-                         (Math/pow (/ q r) 13)
-                         (Math/pow (/ q r) 7)
-                         )
-                       )
-    )
-  )
-
-
-
-; Вычисление ускорения учитывая силу взаимодействия и массы шарика
-; Calculation of speed-up given the strength of the interaction and the mass of the ball
-(defn Speed_up [m_ball e r q]
-  
-  (/ (LennardJonesPower e r q) m_ball)
-  
-  )
-
-
-
-; Вычисление скорости
-(defn Speed [t_step v_current m_ball e r q]
-  
-  (+ 
-    v_current
-    (* (Speed_up m_ball e r q) t_step)
-    )
-  
-  )
-
-
-
-
-; Вычисление координаты Х 
-(defn X [t_step x_current m_ball e r q]
-  
-  (+
-    (+
-      x_current 
-      (* (Speed t_step v_current m_ball e r q)t_step)
-      )
-    
-    (* 
-      (Speed_up m_ball e r q) 
-      (/(Math/pow t_step 2)2)
+  (println
+    (Yvector
+      (int
+        (get 
+          tempVec 
+          (+(* (three (vec tempVec))3)1)
+          )
+        )
       )
     )
   
@@ -97,19 +139,34 @@
 
 
 
-; Вычисление координаты Y 
-(defn Y [t_step y_current m_ball e r q]
+;что-то наверное важное
+(defn three [tempVec]
+  (def tempVec_2 (into-array (repeat (/(count tempVec)3) 0.)))
   
-  (+
-    (+
-      y_current 
-      (* (Speed t_step v_current m_ball e r q)t_step)
-      )
-    
-    (* 
-      (Speed_up m_ball e r q) 
-      (/(Math/pow t_step 2)2)
-      )
+  (for-loop [i 0 (< i (count Xvector)) (inc i)]
+            
+            (aset tempVec_2 i  
+                  (double 
+                    (get tempVec (+(* i 3)2))
+                    )
+                  )
+            
+            )
+  
+  (.indexOf 
+    (vec tempVec_2)
+    (apply min 
+           (vec tempVec_2)
+           )
     )
   
   )
+
+
+
+
+
+
+
+
+
