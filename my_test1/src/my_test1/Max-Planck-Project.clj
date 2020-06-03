@@ -52,13 +52,15 @@
 ; r - the distance between the centers of the particles
 ; q - the distance at which the interaction energy becomes zero
 (defn LennardJonesPower [e r q]
-  (if(<= r (* 2.5 q))
-    (-
-      (* (/ (* 12 e) q)(-(Math/pow (/ q r) 13)(Math/pow (/ q r) 7)))
-      (* (/ (* 12 e) q)(-(Math/pow (/ q (* 2.5 q)) 13)(Math/pow (/ q (* 2.5 q)) 7)))
-      )
+  
+  (if (and (<= r (* 2.5 q))
+           (>= r (* (Math/pow 2 (/ 1 6)) q)))
+    
+    (-(* (/ (* 12 e) q)(-(Math/pow (/ q r) 13)(Math/pow (/ q r) 7)))
+      (* (/ (* 12 e) q)(-(Math/pow (/ q (* 2.5 q)) 13)(Math/pow (/ q (* 2.5 q)) 7))))
     0
     )
+  
   )
 
 ; Вычисление ускорения учитывая силу взаимодействия и массы шарика
@@ -90,40 +92,62 @@
                      :massPart [5 10 15 20]
                      :tempDist [999 999 999]
                      :curDist [999 999 999 999]
-                     :indecs[0 0 0 0]
-                     :n 0
                      })
   
-  (doseq [[x y z i] (map list (x1-x2Sqr(vec(particleData :coordX))) 
-                         (x1-x2Sqr(vec(particleData :coordY)))
-                         (x1-x2Sqr(vec(particleData :coordZ)))
-                         (range (count(particleData :coordX))))]
+  ; Добавить предварительный расчет растояний между частицами!!! 
+  
+  (while (>= (apply max (particleData :curDist))
+             (* (Math/pow 2 (/ 1 6)) (get inData 3)))
     
-    (doseq [[k] (map list (range(count(findAndDelZero (vec z)))))]
-      (def particleData (assoc particleData   :tempDist  (assoc (particleData :tempDist) k  
-                                                                (Math/sqrt (+
-                                                                             (get (vec(findAndDelZero (vec x))) k)
-                                                                             (get (vec(findAndDelZero (vec y))) k)
-                                                                             (get (vec(findAndDelZero (vec z))) k)))
-                                                                )
-                               )))
-    
-    (def particleData (assoc particleData 
-                             :coordX  (assoc (particleData :coordX) i (X  
-                                                                        (get inData 0) (get (particleData :coordX) i) (get (particleData :massPart) i) 
-                                                                        (get inData 1) (get inData 2) (/(apply +(particleData :tempDist))(-(count(particleData :coordX))1)) (get inData 3)
-                                                                        ))
-                             :coordY (assoc (particleData :coordY) i (X  
-                                                                       (get inData 0) (get (particleData :coordY) i) (get (particleData :massPart) i) 
-                                                                       (get inData 1) (get inData 2) (/(apply +(particleData :tempDist))(-(count(particleData :coordX))1)) (get inData 3)
-                                                                       ))
-                             :coordZ (assoc (particleData :coordZ) i (X  
-                                                                       (get inData 0) (get (particleData :coordZ) i) (get (particleData :massPart) i) 
-                                                                       (get inData 1) (get inData 2) (/(apply +(particleData :tempDist))(-(count(particleData :coordX))1)) (get inData 3)
-                                                                       ))
-                             ))
+    (doseq [[x y z i] (map list (x1-x2Sqr(vec(particleData :coordX))) ;x
+                           (x1-x2Sqr(vec(particleData :coordY)))      ;y
+                           (x1-x2Sqr(vec(particleData :coordZ)))      ;z
+                           (range (count(particleData :coordX))))]    ;i
+      
+      (println (particleData :n) (particleData :curDist))
+      
+      (doseq [[k] (map list (range(count(findAndDelZero (vec z)))))]
+        
+        (def particleData (assoc particleData   
+                                 :tempDist  (assoc (particleData :tempDist) k  
+                                                   (Math/sqrt (+
+                                                                (get (vec(findAndDelZero (vec x))) k)
+                                                                (get (vec(findAndDelZero (vec y))) k)
+                                                                (get (vec(findAndDelZero (vec z))) k)))
+                                                   )
+                                 )))
+      
+      (if (>
+            (apply min (particleData :tempDist))
+            
+            )
+        
+        (def particleData (assoc particleData 
+                                 :coordX  (assoc (particleData :coordX) i (coordCulc  
+                                                                            (get inData 0) (get (particleData :coordX) i) (get (particleData :massPart) i) 
+                                                                            (get inData 1) (get inData 2) (apply min (particleData :tempDist)) (get inData 3)
+                                                                            ))
+                                 :coordY (assoc (particleData :coordY) i (coordCulc  
+                                                                           (get inData 0) (get (particleData :coordY) i) (get (particleData :massPart) i) 
+                                                                           (get inData 1) (get inData 2) (apply min (particleData :tempDist)) (get inData 3)
+                                                                           ))
+                                 :coordZ (assoc (particleData :coordZ) i (coordCulc  
+                                                                           (get inData 0) (get (particleData :coordZ) i) (get (particleData :massPart) i) 
+                                                                           (get inData 1) (get inData 2) (apply min (particleData :tempDist)) (get inData 3)
+                                                                           ))
+                                 :curDist  (assoc (particleData :curDist) i  
+                                                  (Math/sqrt (+
+                                                               (get (particleData :coordX) i)
+                                                               (get (particleData :coordY) i)
+                                                               (get (particleData :coordZ) i)
+                                                               ))
+                                                  )
+                                 ))
+        )
+      
+      )
     )
   )
 
 ;        time v e q  dist
-;(newFN [0.1 0 1 10 9]) 
+;(newFN [0.1 0 1 10]) 
