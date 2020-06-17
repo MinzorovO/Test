@@ -45,9 +45,8 @@
 ; q - the distance at which the interaction energy becomes zero
 (defn LennardJonesPower [e q r]
   (if (> r 0)
-    
     (if (<= r (* (Math/pow 2 (/ 1 6)) q))
-      -5
+      -0.2
       (if (<= r (* 2.5 q)) 
         (-(* (/ (* 12 e) q)(-(Math/pow (/ q r) 13)(Math/pow (/ q r) 7)))
           (* (/ (* 12 e) q)(-(Math/pow (/ q (* 2.5 q)) 13)(Math/pow (/ q (* 2.5 q)) 7))))
@@ -124,8 +123,6 @@
     (doseq [[i] (map list (range(count particleData)))]
       (doseq [[j] (map list (range(count particleData)))]
         
-        (println i j)
-        
         (def particleDataCopy (assoc (particleData i) :curLJPower (+ ((particleData i) :curLJPower) 0 (LennardJonesPower (Data 2) (Data 3) 
                                                                                                                          (Math/sqrt(+
                                                                                                                                      (Math/pow(-(((get (vec particleData) i):coord)0) (((get (vec particleData) j):coord)0))2)
@@ -135,12 +132,17 @@
                                                                                                                          )
                                                                      )))
         (def particleData (assoc particleData i particleDataCopy))
-        
         )
-      (println i ((particleData i) :curLJPower))
-      
-      
       )
+    ;(println particleData)
+    
+    (def particleDataNEWCopy (assoc (particleData 0) :curSpeed (Speed (Data 0) ((particleData 0) :curSpeed) 
+                                                                      ((particleData 0) :mass) ((particleData 0) :curLJPower)
+                                                                   )))
+    (println particleDataNEWCopy)
+    
+    ;Speed [t_step v_current m_ball LJpow]
+    
     
     (doseq [[i] (map list (range(count particleData)))]   
       (def particleDataCopy (assoc (particleData i) :curLJPower 0 ))
