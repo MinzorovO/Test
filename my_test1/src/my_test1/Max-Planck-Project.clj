@@ -43,10 +43,7 @@
 ; e - the depth of the potential yawner
 ; r - the distance between the centers of the particles
 ; q - the distance at which the interaction energy becomes zero
-(defn LennardJonesPower [e r q]
-  (println r)
-  
-  ;(if (and (<= r (* 2.5 q)) (>= r (* (Math/pow 2 (/ 1 6)) q)))
+(defn LennardJonesPower [e q r]
   (if (> r 0)
     
     (if (<= r (* (Math/pow 2 (/ 1 6)) q))
@@ -57,6 +54,7 @@
         0    
         )
       )
+    0
     )
   )
 
@@ -119,44 +117,29 @@
                      ])
   
   ;(println "count" (count particleData))
-  (println ((particleData 0):tempDist))
-  
-  ;  (println "ORIGINAL")
-  ;  (println particleData )
-  ;  
-  ;  (def particleDataCopy (assoc (particleData 0) :curLJPower (+((particleData 0) :curLJPower)(LennardJonesPower
-  ;                                                                                              (Data 2)
-  ;                                                                                              (Math/sqrt(+
-  ;                                                                                                          (Math/pow(-(((get (vec particleData) 0):coord)0) (((get (vec particleData) 1):coord)0))2)
-  ;                                                                                                          (Math/pow(-(((get (vec particleData) 0):coord)1) (((get (vec particleData) 1):coord)1))2)
-  ;                                                                                                          (Math/pow(-(((get (vec particleData) 0):coord)2) (((get (vec particleData) 1):coord)2))2)))
-  ;                                                                                              (Data 3)
-  ;                                                                                              ))))  
-  ;  (def particleData (assoc particleData 0 particleDataCopy))  
   (println "CHENGED")
-  ; (println particleData)
   
   (while (> (Data 4) 0)
     
     (doseq [[i] (map list (range(count particleData)))]
-       (doseq [[j] (map list (range(count particleData)))]
+      (doseq [[j] (map list (range(count particleData)))]
+        
+        (println i j)
+        
+        (def particleDataCopy (assoc (particleData i) :curLJPower (+ ((particleData i) :curLJPower) 0 (LennardJonesPower (Data 2) (Data 3) 
+                                                                                                                         (Math/sqrt(+
+                                                                                                                                     (Math/pow(-(((get (vec particleData) i):coord)0) (((get (vec particleData) j):coord)0))2)
+                                                                                                                                     (Math/pow(-(((get (vec particleData) i):coord)1) (((get (vec particleData) j):coord)1))2)
+                                                                                                                                     (Math/pow(-(((get (vec particleData) i):coord)2) (((get (vec particleData) j):coord)2))2)))
+                                                                                                                         
+                                                                                                                         )
+                                                                     )))
+        (def particleData (assoc particleData i particleDataCopy))
+        
+        )
+      (println i ((particleData i) :curLJPower))
       
-      (println i j (+ i j))
       
-      (def particleDataCopy (assoc (particleData i) :curLJPower (+ ((particleData i) :curLJPower) 
-                                                                   (+ i j)) ))
-      )
-      ;        (def particleDataCopy (assoc (particleData i) :curLJPower (+((particleData i) :curLJPower)(LennardJonesPower
-      ;                                                                                                    (Data 2)
-      ;                                                                                                    (Math/sqrt(+
-      ;                                                                                                                (Math/pow(-(((get (vec particleData) i):coord)0) (((get (vec particleData) j):coord)0))2)
-      ;                                                                                                                (Math/pow(-(((get (vec particleData) i):coord)1) (((get (vec particleData) j):coord)1))2)
-      ;                                                                                                                (Math/pow(-(((get (vec particleData) i):coord)2) (((get (vec particleData) j):coord)2))2)))
-      ;                                                                                                    (Data 3)
-      ;                                                                                                    ))))  
-      
-      (def particleData (assoc particleData i particleDataCopy))
-      (println i particleData) 
       )
     
     (doseq [[i] (map list (range(count particleData)))]   
@@ -179,10 +162,10 @@
 ;        (println 
 ;          (LennardJonesPower
 ;            (Data 2)
-;            (Math/sqrt(+
-;                        (Math/pow(-(((get (vec particleData) i):coord)0) (((get (vec particleData) j):coord)0))2)
-;                        (Math/pow(-(((get (vec particleData) i):coord)1) (((get (vec particleData) j):coord)1))2)
-;                        (Math/pow(-(((get (vec particleData) i):coord)2) (((get (vec particleData) j):coord)2))2)))
+;(Math/sqrt(+
+;            (Math/pow(-(((get (vec particleData) i):coord)0) (((get (vec particleData) j):coord)0))2)
+;            (Math/pow(-(((get (vec particleData) i):coord)1) (((get (vec particleData) j):coord)1))2)
+;            (Math/pow(-(((get (vec particleData) i):coord)2) (((get (vec particleData) j):coord)2))2)))
 ;            (Data 3)
 ;            )
 ;          )
