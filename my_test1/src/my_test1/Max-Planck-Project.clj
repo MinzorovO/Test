@@ -86,11 +86,9 @@
      (def particleData (assoc particleData i particleDataCopy))
      )
       
-   (def particleDataCopy (assoc (particleData i) :curSpeed (Speed (Data 0) ((particleData i) :curSpeed) 
-                                                                     ((particleData i) :mass) ((particleData i) :curLJPower)
-                                                                     
-                                                                     
-                                                                  )
+   (def particleDataCopy (assoc (particleData i) :curSpeed (Math/sqrt(Math/pow(Speed (Data 0) ((particleData i) :curSpeed) 
+                                                                     ((particleData i) :mass) ((particleData i) :curLJPower) 
+                                                                  )2))
                                 :coord  [(coordCulc (Data 0) (((particleData i):coord)0) ((particleData i) :mass) ((particleData i) :curSpeed) ((particleData i) :curLJPower))
                                             (coordCulc (Data 0) (((particleData i):coord)1) ((particleData i) :mass) ((particleData i) :curSpeed) ((particleData i) :curLJPower))
                                             (coordCulc (Data 0) (((particleData i):coord)2) ((particleData i) :mass) ((particleData i) :curSpeed) ((particleData i) :curLJPower))]
@@ -99,7 +97,8 @@
    )
       
   (doseq [[i] (map list (range(count particleData)))]   
-      (def particleDataCopy (assoc (particleData i) :curLJPower 0 ))
+      (def particleDataCopy (assoc (particleData i) :curLJPower 0
+                                   :curSpeed 0))
       (def particleData (assoc particleData i particleDataCopy))
       )
   
