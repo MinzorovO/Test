@@ -57,22 +57,16 @@
     )
   )
 
-; Вычисление ускорения учитывая силу взаимодействия и массы шарика
-; Calculation of speed-up given the strength of the interaction and the mass of the ball
-(defn Speed_up [m_ball LJpow]
-  (/ LJpow m_ball)
-  )
-
 ; Вычисление скорости
 (defn Speed [t_step v_current m_ball LJpow]
-  ( + v_current (* (Speed_up m_ball LJpow) t_step))
+  ( + v_current (* (/ LJpow m_ball) t_step))
   )
 
 ; Вычисление координаты Х 
 (defn coordCulc [t_step x_current m_ball speed LJpow]
   (+
     (+ x_current (* speed t_step))
-    (* (Speed_up m_ball LJpow) (/(Math/pow t_step 2)2))
+    (* (/ LJpow m_ball) (/(Math/pow t_step 2)2))
     )
   )
 ;
@@ -83,7 +77,7 @@
   
   (def particleData [
                      {
-                      :coord[1 1 1]
+                      :coord[0 1 2]
                       :mass 5
                       :curLJPower 0
                       :curSpeed 0
@@ -115,7 +109,7 @@
                       }
                      ])
   
-  ;(println "count" (count particleData))
+  
   (println "CHENGED")
   
   (while (> (Data 4) 0)
@@ -123,26 +117,32 @@
     (doseq [[i] (map list (range(count particleData)))]
       (doseq [[j] (map list (range(count particleData)))]
         
-        (def particleDataCopy (assoc (particleData i) :curLJPower (+ ((particleData i) :curLJPower) 0 (LennardJonesPower (Data 2) (Data 3) 
-                                                                                                                         (Math/sqrt(+
-                                                                                                                                     (Math/pow(-(((get (vec particleData) i):coord)0) (((get (vec particleData) j):coord)0))2)
-                                                                                                                                     (Math/pow(-(((get (vec particleData) i):coord)1) (((get (vec particleData) j):coord)1))2)
-                                                                                                                                     (Math/pow(-(((get (vec particleData) i):coord)2) (((get (vec particleData) j):coord)2))2)))
-                                                                                                                         
-                                                                                                                         )
-                                                                     )))
+        (def particleDataCopy (assoc (particleData i) :curLJPower (+ ((particleData i) :curLJPower) (LennardJonesPower (Data 2) (Data 3) 
+                                                                                                                       (Math/sqrt(+
+                                                                                                                                   (Math/pow(-(((get (vec particleData) i):coord)0) (((get (vec particleData) j):coord)0))2)
+                                                                                                                                   (Math/pow(-(((get (vec particleData) i):coord)1) (((get (vec particleData) j):coord)1))2)
+                                                                                                                                   (Math/pow(-(((get (vec particleData) i):coord)2) (((get (vec particleData) j):coord)2))2)))
+                                                                                                                       ))))
         (def particleData (assoc particleData i particleDataCopy))
         )
+      
+      (def particleDataCopy (assoc (particleData i) :curSpeed (Speed (Data 0) ((particleData i) :curSpeed) 
+                                                                     ((particleData i) :mass) ((particleData i) :curLJPower)
+                                                                     )))
+      ;(doseq [[j] (map list (range(-(count particleData)1)))]
+        ;(println i j) 
+        ;coordCulc [t_step x_current m_ball speed LJpow]
+        (def particleDataCopy (assoc (particleData i):coord  [(coordCulc (Data 0) (((particleData i):coord)0) ((particleData i) :mass) ((particleData i) :curSpeed) ((particleData i) :curLJPower))
+                                                              (coordCulc (Data 0) (((particleData i):coord)1) ((particleData i) :mass) ((particleData i) :curSpeed) ((particleData i) :curLJPower))
+                                                              (coordCulc (Data 0) (((particleData i):coord)2) ((particleData i) :mass) ((particleData i) :curSpeed) ((particleData i) :curLJPower))]
+                                     )) 
+       ; )
+      
+      (def particleData (assoc particleData i particleDataCopy))
       )
-    ;(println particleData)
     
-    (def particleDataNEWCopy (assoc (particleData 0) :curSpeed (Speed (Data 0) ((particleData 0) :curSpeed) 
-                                                                      ((particleData 0) :mass) ((particleData 0) :curLJPower)
-                                                                   )))
-    (println particleDataNEWCopy)
     
-    ;Speed [t_step v_current m_ball LJpow]
-    
+    (println particleData)            
     
     (doseq [[i] (map list (range(count particleData)))]   
       (def particleDataCopy (assoc (particleData i) :curLJPower 0 ))
