@@ -8,13 +8,13 @@
 ; r - the distance between the centers of the particles
 ; q - the distance at which the interaction energy becomes zero
 (defn LennardJonesPower [e q r]
-  (println "r" r)
   (if (> r 0)
     (if (<= r (* (Math/pow 2 (/ 1 6)) q))
-      -50
+      -0.02
       (if (<= r (* 2.5 q)) 
-        10
-        5    
+        (-(* (/ (* 12 e) q)(-(Math/pow (/ q r) 13)(Math/pow (/ q r) 7)))
+          (* (/ (* 12 e) q)(-(Math/pow (/ q (* 2.5 q)) 13)(Math/pow (/ q (* 2.5 q)) 7))))
+        0.0002    
         )
       )
     0
@@ -52,22 +52,22 @@
   (q/with-translation ((data 1) :coord)
     (q/sphere ((data 1) :mass)))
   
-  (q/sphere-detail 15)
-  (q/with-translation ((data 2) :coord)
-    (q/sphere ((data 2) :mass)))
-  
-  
-  (q/sphere-detail 15)
-  (q/with-translation ((data 3) :coord)
-    (q/sphere ((data 3) :mass)))
+;  (q/sphere-detail 15)
+;  (q/with-translation ((data 2) :coord)
+;    (q/sphere ((data 2) :mass)))
+;  
+;  
+;  (q/sphere-detail 15)
+;  (q/with-translation ((data 3) :coord)
+;    (q/sphere ((data 3) :mass)))
   
   )
 
 (defn draw [state]
   
   (let [t (/ (q/frame-count) 25)]
-    
-    (def Data [0.1 0 2 10 1])
+    ;        time_step-0 v-1 e-2 q-3
+    (def Data [1 0 11 100])
     
     (doseq [[i] (map list (range(count particleData)))]
       (doseq [[j] (map list (range(count particleData)))]  
@@ -80,12 +80,11 @@
                                                                                                                        ))))
         (def particleData (assoc particleData i particleDataCopy))
         )
-      (println ((particleData i):curLJPower))
       )
     
     (doseq [[i] (map list (range(count particleData)))]
-      (def particleDataCopy (assoc (particleData i) :curSpeed (Math/sqrt(Math/pow(Speed (Data 0) ((particleData i) :curSpeed) 
-                                                                                        ((particleData i) :mass) ((particleData i) :curLJPower) )2))
+      (def particleDataCopy (assoc (particleData i) :curSpeed (Speed (Data 0) ((particleData i) :curSpeed) 
+                                                                                        ((particleData i) :mass) ((particleData i) :curLJPower) )
                                    
                                    :coord  [(coordCulc (Data 0) (((particleData i):coord)0) ((particleData i) :mass) ((particleData i) :curSpeed) ((particleData i) :curLJPower))
                                             (coordCulc (Data 0) (((particleData i):coord)1) ((particleData i) :mass) ((particleData i) :curSpeed) ((particleData i) :curLJPower))
@@ -112,25 +111,13 @@
   (q/frame-rate 60)
   (def particleData [
                      {
-                      :coord[0 0 0]
+                      :coord[10 0 0]
                       :mass 5
                       :curLJPower 0
                       :curSpeed 0
                       }
                      {
-                      :coord[7 5 8]
-                      :mass 5
-                      :curLJPower 0
-                      :curSpeed 0
-                      }
-                     {
-                      :coord[13 0 0]
-                      :mass 5
-                      :curLJPower 0
-                      :curSpeed 0
-                      }
-                     {
-                      :coord[0 13 0]
+                      :coord[10 0 0]
                       :mass 5
                       :curLJPower 0
                       :curSpeed 0
