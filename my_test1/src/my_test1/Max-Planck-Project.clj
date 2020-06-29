@@ -10,7 +10,7 @@
 (defn LennardJonesPower [e q r]
   (if (> r 0)
     (if (<= r (* (Math/pow 2 (/ 1 6)) q))
-      -0.02
+      -0.5
       (if (<= r (* 2.5 q)) 
         (-(* (/ (* 12 e) q)(-(Math/pow (/ q r) 13)(Math/pow (/ q r) 7)))
           (* (/ (* 12 e) q)(-(Math/pow (/ q (* 2.5 q)) 13)(Math/pow (/ q (* 2.5 q)) 7))))
@@ -84,7 +84,7 @@
     
     (doseq [[i] (map list (range(count particleData)))]
       (def particleDataCopy (assoc (particleData i) :curSpeed (Speed (Data 0) ((particleData i) :curSpeed) 
-                                                                                        ((particleData i) :mass) ((particleData i) :curLJPower) )
+                                                                                        ((particleData i) :mass) ((particleData i) :curLJPower))
                                    
                                    :coord  [(coordCulc (Data 0) (((particleData i):coord)0) ((particleData i) :mass) ((particleData i) :curSpeed) ((particleData i) :curLJPower))
                                             (coordCulc (Data 0) (((particleData i):coord)1) ((particleData i) :mass) ((particleData i) :curSpeed) ((particleData i) :curLJPower))
@@ -111,14 +111,14 @@
   (q/frame-rate 60)
   (def particleData [
                      {
-                      :coord[10 0 0]
+                      :coord[10 8 0]
                       :mass 5
                       :curLJPower 0
                       :curSpeed 0
                       }
                      {
                       :coord[10 0 0]
-                      :mass 5
+                      :mass 10
                       :curLJPower 0
                       :curSpeed 0
                       }
