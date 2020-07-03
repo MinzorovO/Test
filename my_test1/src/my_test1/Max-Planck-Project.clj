@@ -117,8 +117,8 @@
                       :curSpeed 0
                       }
                      {
-                      :coord[10 0 0]
-                      :mass 10
+                      :coord[10 20 0]
+                      :mass 5
                       :curLJPower 0
                       :curSpeed 0
                       }
@@ -132,3 +132,4 @@
     :draw draw 
     :middleware [m/fun-mode]
     :renderer :opengl))
+(-main 1)
