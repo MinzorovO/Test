@@ -4,7 +4,7 @@
   (:gen-class)
   )
 ;---------------------------------------------------------------------------------------------
-; Вычисление силы взаимодействия шариков используя потенциал Ленарда-Джонса
+; 
 ; Calculation of the force of interaction of balls using the Lenard-Jones potential
 ; e - the depth of the potential yawner
 ; r - the distance between the centers of the particles
@@ -23,19 +23,19 @@
   )
 ;---------------------------------------------------------------------------------------------
 ;---------------------------------------------------------------------------------------------
-; Вычисление скорости
+; 
 (defn Speed [t_step v_current m_ball LJpow]
   (+ v_current (* (/ LJpow m_ball) t_step))
   )
 ;---------------------------------------------------------------------------------------------
 ;---------------------------------------------------------------------------------------------
-; Вычисление координаты Х 
+; 
 (defn newParticleCoordinate [t_step cord_current m_ball speed LJpow]
   (+ cord_current (* speed t_step) (* (/ LJpow m_ball) (/(Math/pow t_step 2)2)))
   )
 ;---------------------------------------------------------------------------------------------
 ;---------------------------------------------------------------------------------------------
-(defn funс []
+(defn func []
   
   (doseq [[i] (map list (range(count particleData)))]
     (doseq [[j] (map list (range(count particleData)))]  
@@ -101,7 +101,7 @@
     (q/with-translation ((particleData 3) :coord)
       (q/sphere ((particleData 3) :mass)))
     
-    (funс)
+    (func)
     )
   )
 ;---------------------------------------------------------------------------------------------
