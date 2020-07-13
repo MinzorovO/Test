@@ -71,38 +71,26 @@
 ;---------------------------------------------------------------------------------------------
 (defn draw [state]
   
-  (let [t (/ (q/frame-count) 25)]
-    
-    (q/clear)
-    (q/camera 50 50 50 0 0 0 0 0 -1)
-    ; draw red X axis
-    (q/stroke 255 0 0)
-    (q/line 0 0 0 1000 0 0)
-    ; draw green Y axis
-    (q/stroke 0 255 0)
-    (q/line 0 0 0 0 1000 0)
-    ; draw blue Z axis
-    (q/stroke 0 0 255)
-    (q/line 0 0 0 0 0 1000)
-    
+  (q/clear)
+  (q/camera 50 50 50 0 0 0 0 0 -1)
+  ; draw red X axis
+  (q/stroke 255 0 0)
+  (q/line 0 0 0 1000 0 0)
+  ; draw green Y axis
+  (q/stroke 0 255 0)
+  (q/line 0 0 0 0 1000 0)
+  ; draw blue Z axis
+  (q/stroke 0 0 255)
+  (q/line 0 0 0 0 0 1000)
+  
+  
+  (doseq [[i] (map list (range(count particleData)))]
     (q/sphere-detail 15)
-    (q/with-translation ((particleData 0) :coord)
-      (q/sphere ((particleData 0) :mass)))
-    
-    (q/sphere-detail 15)
-    (q/with-translation ((particleData 1) :coord)
-      (q/sphere ((particleData 1) :mass)))
-    
-    (q/sphere-detail 15)
-    (q/with-translation ((particleData 2) :coord)
-      (q/sphere ((particleData 2) :mass)))
-    
-    (q/sphere-detail 15)
-    (q/with-translation ((particleData 3) :coord)
-      (q/sphere ((particleData 3) :mass)))
-    
-    (func)
+    (q/with-translation ((particleData i) :coord)
+      (q/sphere ((particleData i) :mass)))
     )
+  
+  (func)
   )
 ;---------------------------------------------------------------------------------------------
 ;---------------------------------------------------------------------------------------------
