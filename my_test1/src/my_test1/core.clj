@@ -60,10 +60,6 @@
     :middleware [m/fun-mode]
     :renderer :opengl))
 ;---------------------------------------------------------------------------------------------
-; Calculation of the force of interaction of balls using the Lenard-Jones potential
-; e - the depth of the potential yawner
-; r - the distance between the centers of the particles
-; q - the distance at which the interaction energy becomes zero
 (defn LennardJonesPower [e q r]
   (if (> r 0)
     (if (<= r (* (Math/pow 2 (/ 1 6)) q))    (*(* e 0.02)-1)
@@ -83,28 +79,34 @@
 ;---------------------------------------------------------------------------------------------
 (defn updatePartData [] 
   
-  (let [buf (to-array (repeat (count particleData) 0))]
-    (doseq [[i] (map list (range(count particleData)))]
-      (doseq [[j] (map list (range(count particleData)))]  
-        (aset buf i (+ ((vec buf)0)
-                       (LennardJonesPower (Data 2) (Data 3) 
-                                          (Math/sqrt(+
-                                                      (Math/pow(-(((get (vec particleData) i):coord)0) (((get (vec particleData) j):coord)0))2)
-                                                      (Math/pow(-(((get (vec particleData) i):coord)1) (((get (vec particleData) j):coord)1))2)
-                                                      (Math/pow(-(((get (vec particleData) i):coord)2) (((get (vec particleData) j):coord)2))2)))
-                                          ))) 
-        )
-      )
+  (doseq [[k] (map list (range(count particleData)))] 
     
-    (doseq [[i] (map list (range(count particleData)))]
-      (def particleDataCopy (assoc (particleData i) 
-                                   :curSpeed (Math/abs (Speed (Data 0) ((particleData i) :curSpeed)((particleData i) :mass) ((vec buf)0)))
-                                   :coord  [(newParticleCoordinate (Data 0) (((particleData i):coord)0) ((particleData i) :mass) ((particleData i) :curSpeed) ((vec buf)0))
-                                            (newParticleCoordinate (Data 0) (((particleData i):coord)1) ((particleData i) :mass) ((particleData i) :curSpeed) ((vec buf)0))
-                                            (newParticleCoordinate (Data 0) (((particleData i):coord)2) ((particleData i) :mass) ((particleData i) :curSpeed) ((vec buf)0))]
-                                   
-                                   ))      
-      (def particleData (assoc particleData i particleDataCopy))
+    (let [[powLJ speed coord] [(into-array Double/TYPE [0]) (into-array Double/TYPE [((particleData k) :curSpeed)]) (to-array ((particleData k) :coord)) ]]
+      
+      (doseq [[j] (map list (range(count particleData)))]  
+        (aset powLJ 0 (+ ((vec powLJ)0) (LennardJonesPower (Data 2) (Data 3) 
+                                                           (Math/sqrt(+
+                                                                       (Math/pow(-(((get (vec particleData) k):coord)0) (((get (vec particleData) j):coord)0))2)
+                                                                       (Math/pow(-(((get (vec particleData) k):coord)1) (((get (vec particleData) j):coord)1))2)
+                                                                       (Math/pow(-(((get (vec particleData) k):coord)2) (((get (vec particleData) j):coord)2))2)))
+                                                           ))) 
+        )  
+      
+      (aset speed 0 (Math/abs (Speed (Data 0) ((vec speed)0) ((particleData k) :mass) ((vec powLJ)0))))
+      
+      (doseq [[i] (map list (range(count coord)))]
+        (aset coord i (newParticleCoordinate (Data 0) (((particleData k):coord)i) ((particleData i) :mass) ((vec speed)0) ((vec powLJ)0)))
+        )      
+      
+      (def particleData (assoc particleData 0 1))
+      
+      ;        ;      (def particleDataCopy (assoc (particleData i) 
+      ;        ;                                   :curSpeed (Math/abs (Speed (Data 0) ((particleData i) :curSpeed)((particleData i) :mass) ((vec buf)0)))
+      ;        ;                                   :coord  [(newParticleCoordinate (Data 0) (((particleData i):coord)0) ((particleData i) :mass) ((particleData i) :curSpeed) ((vec buf)0))
+      ;        ;                                            (newParticleCoordinate (Data 0) (((particleData i):coord)1) ((particleData i) :mass) ((particleData i) :curSpeed) ((vec buf)0))
+      ;        ;                                            (newParticleCoordinate (Data 0) (((particleData i):coord)2) ((particleData i) :mass) ((particleData i) :curSpeed) ((vec buf)0))]
+      ;        ;                                   ))      
+      ;        ;          
       )
     )
   )
