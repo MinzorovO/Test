@@ -78,38 +78,32 @@
   )
 ;---------------------------------------------------------------------------------------------
 (defn updatePartData [] 
-  
-  (doseq [[k] (map list (range(count particleData)))] 
-    
-    (let [[powLJ speed coord] [(into-array Double/TYPE [0]) (into-array Double/TYPE [((particleData k) :curSpeed)]) (to-array ((particleData k) :coord)) ]]
-      
+  (let [LJpow (to-array (repeat (count particleData) 0))]
+    (doseq [[i] (map list (range(count particleData)))]
       (doseq [[j] (map list (range(count particleData)))]  
-        (aset powLJ 0 (+ ((vec powLJ)0) (LennardJonesPower (Data 2) (Data 3) 
-                                                           (Math/sqrt(+
-                                                                       (Math/pow(-(((get (vec particleData) k):coord)0) (((get (vec particleData) j):coord)0))2)
-                                                                       (Math/pow(-(((get (vec particleData) k):coord)1) (((get (vec particleData) j):coord)1))2)
-                                                                       (Math/pow(-(((get (vec particleData) k):coord)2) (((get (vec particleData) j):coord)2))2)))
-                                                           ))) 
-        )  
-      
-      (aset speed 0 (Math/abs (Speed (Data 0) ((vec speed)0) ((particleData k) :mass) ((vec powLJ)0))))
-      
-      (doseq [[i] (map list (range(count coord)))]
-        (aset coord i (newParticleCoordinate (Data 0) (((particleData k):coord)i) ((particleData i) :mass) ((vec speed)0) ((vec powLJ)0)))
-        )      
-      
-      (def particleData (assoc particleData 0 1))
-      
-      ;        ;      (def particleDataCopy (assoc (particleData i) 
-      ;        ;                                   :curSpeed (Math/abs (Speed (Data 0) ((particleData i) :curSpeed)((particleData i) :mass) ((vec buf)0)))
-      ;        ;                                   :coord  [(newParticleCoordinate (Data 0) (((particleData i):coord)0) ((particleData i) :mass) ((particleData i) :curSpeed) ((vec buf)0))
-      ;        ;                                            (newParticleCoordinate (Data 0) (((particleData i):coord)1) ((particleData i) :mass) ((particleData i) :curSpeed) ((vec buf)0))
-      ;        ;                                            (newParticleCoordinate (Data 0) (((particleData i):coord)2) ((particleData i) :mass) ((particleData i) :curSpeed) ((vec buf)0))]
-      ;        ;                                   ))      
-      ;        ;          
+        (aset LJpow i (+ ((vec LJpow)0)
+                         (LennardJonesPower (Data 2) (Data 3) 
+                                            (Math/sqrt(+
+                                                        (Math/pow(-(((get (vec particleData) i):coord)0) (((get (vec particleData) j):coord)0))2)
+                                                        (Math/pow(-(((get (vec particleData) i):coord)1) (((get (vec particleData) j):coord)1))2)
+                                                        (Math/pow(-(((get (vec particleData) i):coord)2) (((get (vec particleData) j):coord)2))2)))
+                                            ))) 
+        )
+      )
+    
+    (doseq [[i] (map list (range(count particleData)))]
+      (def particleDataCopy (assoc (particleData i) 
+                                   :curSpeed (Math/abs (Speed (Data 0) ((particleData i) :curSpeed)((particleData i) :mass) ((vec LJpow)0)))
+                                   :coord  [(newParticleCoordinate (Data 0) (((particleData i):coord)0) ((particleData i) :mass) ((particleData i) :curSpeed) ((vec LJpow)0))
+                                            (newParticleCoordinate (Data 0) (((particleData i):coord)1) ((particleData i) :mass) ((particleData i) :curSpeed) ((vec LJpow)0))
+                                            (newParticleCoordinate (Data 0) (((particleData i):coord)2) ((particleData i) :mass) ((particleData i) :curSpeed) ((vec LJpow)0))]
+                                   
+                                   ))      
+      (def particleData (assoc particleData i particleDataCopy))
       )
     )
   )
+
 ;---------------------------------------------------------------------------------------------
 (defn -main []
   (dataSetup [10 0 100 65])
