@@ -3,6 +3,7 @@
   (:require [quil.core :as q]
             [quil.middleware :as m])
   )
+(def Data)
 ;---------------------------------------------------------------------------------------------
 (defn setup []
   (q/color-mode :rgb)
@@ -29,36 +30,6 @@
                       :curSpeed 0
                       }
                      ]){})
-;---------------------------------------------------------------------------------------------
-(defn draw [state]  
-  (q/clear)
-  (q/camera 150 150 150 0 0 0 0 0 -1)
-  ; draw red X axis
-  (q/stroke 255 0 0)
-  (q/line 0 0 0 1000 0 0)
-  ; draw green Y axis
-  (q/stroke 0 255 0)
-  (q/line 0 0 0 0 1000 0)
-  ; draw blue Z axis
-  (q/stroke 0 0 255)
-  (q/line 0 0 0 0 0 1000)
-  
-  (doseq [[i] (map list (range(count particleData)))]
-    (q/sphere-detail 15)
-    (q/with-translation ((particleData i) :coord)
-      (q/sphere ((particleData i) :mass))))
-  
-  (updatePartData)
-  )
-;---------------------------------------------------------------------------------------------
-(defn dataSetup [x]
-  (def Data x)
-  (q/defsketch quil-experiments
-    :size [750 750]
-    :setup setup
-    :draw draw 
-    :middleware [m/fun-mode]
-    :renderer :opengl))
 ;---------------------------------------------------------------------------------------------
 (defn LennardJonesPower [e q r]
   (if (> r 0)
@@ -103,7 +74,36 @@
       )
     )
   )
-
+;---------------------------------------------------------------------------------------------
+(defn draw [state]  
+  (q/clear)
+  (q/camera 150 150 150 0 0 0 0 0 -1)
+  ; draw red X axis
+  (q/stroke 255 0 0)
+  (q/line 0 0 0 1000 0 0)
+  ; draw green Y axis
+  (q/stroke 0 255 0)
+  (q/line 0 0 0 0 1000 0)
+  ; draw blue Z axis
+  (q/stroke 0 0 255)
+  (q/line 0 0 0 0 0 1000)
+  
+  (doseq [[i] (map list (range(count particleData)))]
+    (q/sphere-detail 15)
+    (q/with-translation ((particleData i) :coord)
+      (q/sphere ((particleData i) :mass))))
+  
+  (updatePartData)
+  )
+;---------------------------------------------------------------------------------------------
+(defn dataSetup [x]
+  (def Data x)
+  (q/defsketch quil-experiments
+    :size [750 750]
+    :setup setup
+    :draw draw 
+    :middleware [m/fun-mode]
+    :renderer :opengl))
 ;---------------------------------------------------------------------------------------------
 (defn -main []
   (dataSetup [10 0 100 65])
